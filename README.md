@@ -35,13 +35,13 @@
 <div align="center">
 
 ### نمودار ترند ماهانه
-<img src="docs/wave.png" alt="Wave chart" width="800" />
+<img width="1212" height="227" alt="wave" src="https://github.com/user-attachments/assets/3a609412-33e1-44e6-8242-a2246612950f" />
+
 
 ### تحلیل‌های ماهانه
-<img src="docs/donuts.png" alt="Donuts" width="800" />
+<img width="1585" height="160" alt="donuts" src="https://github.com/user-attachments/assets/1a7b859e-5e25-40cc-9933-048cd7039771" />
 
-### پنل کنترل شناور
-<img src="docs/control-panel.png" alt="Control panel" width="500" />
+### پنل کنترل شناور<img width="357" height="586" alt="control-panel" src="https://github.com/user-attachments/assets/6906d7af-83ee-467f-84e2-885ff7d5f747" />
 
 </div>
 
