@@ -12,7 +12,7 @@
 
 <br />
 
-<img src="docs/hero.png" alt="Habit Tracker Preview" width="900" />
+<img width="1585" height="160" alt="donuts" src="https://github.com/user-attachments/assets/cfb3efba-f07f-4f78-b6bc-cc81c6425e7a" />
 
 </div>
 
