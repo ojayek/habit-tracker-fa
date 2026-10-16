@@ -1,6 +1,6 @@
 <div align="center">
 
-# 📅 ردیاب عادت ماهانه شمسی
+# 📅 ردیاب عادت ماهانه شمسیC:\Users\hessam\Desktop\habit-tracker\habit-tracker\docs\hero.png
 
 ### یک ردیاب عادت مینیمال با تقویم جلالی
 
