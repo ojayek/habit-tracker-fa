@@ -1,0 +1,1645 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+public/
+  app.js
+  index.html
+  style.css
+data.json
+package.json
+README.md
+server.js
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="public/app.js">
+/* ============================================================ Jalali */
+(function () {
+  function div(a, b) { return ~~(a / b); }
+  function mod(a, b) { return a - ~~(a / b) * b; }
+  function jalCal(jy) {
+    const breaks = [-61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181, 1210, 1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178];
+    let bl = breaks.length, gy = jy + 621, leapJ = -14, jp = breaks[0], jm, jump, leap, leapG, march, n;
+    for (let i = 1; i < bl; i++) {
+      jm = breaks[i]; jump = jm - jp;
+      if (jy < jm) break;
+      leapJ += div(jump, 33) * 8 + div(mod(jump, 33), 4);
+      jp = jm;
+    }
+    n = jy - jp;
+    leapJ += div(n, 33) * 8 + div(mod(n, 33) + 3, 4);
+    if (mod(jump, 33) === 4 && jump - n === 4) leapJ++;
+    leapG = div(gy, 4) - div((div(gy, 100) + 1) * 3, 4) - 150;
+    march = 20 + leapJ - leapG;
+    if (jump - n < 6) n = n - jump + div(jump + 4, 33) * 33;
+    leap = mod(mod(n + 1, 33) - 1, 4);
+    if (leap === -1) leap = 4;
+    return { leap, gy, march };
+  }
+  function g2d(gy, gm, gd) {
+    let d = div((gy + div(gm - 8, 6) + 100100) * 1461, 4)
+      + div(153 * mod(gm + 9, 12) + 2, 5) + gd - 34840408;
+    d = d - div(div(gy + 100100 + div(gm - 8, 6), 100) * 3, 4) + 752;
+    return d;
+  }
+  function d2g(jdn) {
+    let j = 4 * jdn + 139361631;
+    j = j + div(div(4 * jdn + 183187720, 146097) * 3, 4) * 4 - 3908;
+    const i = div(mod(j, 1461), 4) * 5 + 308;
+    const gd = div(mod(i, 153), 5) + 1;
+    const gm = mod(div(i, 153), 12) + 1;
+    const gy = div(j, 1461) - 100100 + div(8 - gm, 6);
+    return { gy, gm, gd };
+  }
+  function j2d(jy, jm, jd) {
+    const r = jalCal(jy);
+    return g2d(r.gy, 3, r.march) + (jm - 1) * 31 - div(jm, 7) * (jm - 7) + jd - 1;
+  }
+  function d2j(jdn) {
+    let gy = d2g(jdn).gy, jy = gy - 621, jd, jm;
+    const r = jalCal(jy), jdn1f = g2d(gy, 3, r.march);
+    let k = jdn - jdn1f;
+    if (k >= 0) {
+      if (k <= 185) { jm = 1 + div(k, 31); jd = mod(k, 31) + 1; return { jy, jm, jd }; }
+      k -= 186;
+    } else { jy -= 1; k += 179; if (r.leap === 1) k += 1; }
+    jm = 7 + div(k, 30); jd = mod(k, 30) + 1;
+    return { jy, jm, jd };
+  }
+  window.Jalali = {
+    toJalaali: (gy, gm, gd) => d2j(g2d(gy, gm, gd)),
+    toGregorian: (jy, jm, jd) => d2g(j2d(jy, jm, jd)),
+    jalaaliMonthLength: (jy, jm) =>
+      jm <= 6 ? 31 : jm <= 11 ? 30 : (jalCal(jy).leap === 0 ? 30 : 29),
+  };
+})();
+
+/* ============================================================ Icons */
+const FALLBACK_ICONS = {
+  settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.89 1.7 1.7 0 0 0 4.26 7l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6h.09A1.7 1.7 0 0 0 10 3.05V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55h.09a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9v.09a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  chevron: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+};
+let ICONS = {};
+async function loadIcons() {
+  try { ICONS = await fetch('/api/icons').then(r => r.json()) || {}; } catch { }
+}
+function iconSvg(name) { return ICONS[name] || FALLBACK_ICONS[name] || ''; }
+function applyIcons(root = document) {
+  root.querySelectorAll('[data-icon]').forEach(el => {
+    const svg = iconSvg(el.getAttribute('data-icon'));
+    if (svg) el.innerHTML = svg;
+  });
+}
+
+/* ============================================================ Constants */
+const MONTHS = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+  'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+const DOW_LETTERS = ['ی', 'د', 'س', 'چ', 'پ', 'ج', 'ش'];
+
+const HABIT_COLORS = ['#10B981', '#8B5CF6', '#0EA5E9', '#EF4444', '#F59E0B',
+  '#22D3EE', '#D946EF', '#84CC16', '#EC4899', '#14B8A6'];
+const colorFor = (i, h) => h?.color || HABIT_COLORS[i % HABIT_COLORS.length];
+
+/* اعداد لاتین — همیشه */
+const pad2 = (n) => String(n).padStart(2, '0');
+const monthKey = (y, m) => `${y}-${pad2(m)}`;
+
+function dowLetterForJalaliDay(jy, jm, jd) {
+  const g = Jalali.toGregorian(jy, jm, jd);
+  const d = new Date(g.gy, g.gm - 1, g.gd);
+  return DOW_LETTERS[d.getDay()];
+}
+
+/* ============================================================ State */
+const LS = {
+  collapsed: 'habit.collapsed',
+  panelOpen: 'habit.panelOpen',
+  dateHidden: 'habit.dateHidden',
+  views: 'habit.views',
+};
+const state = {
+  year: 1403, month: 7,
+  habits: [], records: {},
+  today: null, editingId: null,
+  collapsed: new Set(JSON.parse(localStorage.getItem(LS.collapsed) || '[]')),
+  compactAll: false,
+  panelOpen: localStorage.getItem(LS.panelOpen) !== '0',
+  dateHidden: localStorage.getItem(LS.dateHidden) === '1',
+  hideDate: localStorage.getItem('habit.hideDate') === '1',
+  hideHabitCol: localStorage.getItem('habit.hideHabitCol') === '1',
+  views: Object.assign(
+    { date: true, wave: true, rate: true, habits: true, donuts: true },
+    JSON.parse(localStorage.getItem(LS.views) || '{}')
+  ),
+};
+
+/* ============================================================ API */
+const api = {
+  getData: () => fetch('/api/data').then((r) => r.json()),
+  addHabit: (name, goal) => fetch('/api/habits', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, goal }),
+  }).then((r) => r.json()),
+  updateHabit: (id, name, goal) => fetch('/api/habits/' + encodeURIComponent(id), {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, goal }),
+  }).then((r) => r.json()),
+  deleteHabit: (id) => fetch('/api/habits/' + encodeURIComponent(id), { method: 'DELETE' }).then((r) => r.json()),
+  toggle: (monthKey, habitId, day) => fetch('/api/toggle', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ monthKey, habitId, day }),
+  }).then((r) => r.json()),
+};
+
+/* ============================================================ Selectors */
+function buildSelectors() {
+  const yearSel = document.getElementById('year-select');
+  const monthSel = document.getElementById('month-select');
+  const cy = state.today.jy;
+  yearSel.innerHTML = '';
+  for (let y = cy - 2; y <= cy + 2; y++) {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = String(y);
+    yearSel.appendChild(o);
+  }
+  yearSel.value = state.year;
+  monthSel.innerHTML = '';
+  MONTHS.forEach((m, i) => {
+    const o = document.createElement('option');
+    o.value = i + 1; o.textContent = m;
+    monthSel.appendChild(o);
+  });
+  monthSel.value = state.month;
+  yearSel.onchange = () => { state.year = +yearSel.value; render(); };
+  monthSel.onchange = () => { state.month = +monthSel.value; render(); };
+}
+
+const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* ============================================================ Info + Rate */
+function renderInfoAndRate(totals) {
+  const days = Jalali.jalaaliMonthLength(state.year, state.month);
+  const start = Jalali.toGregorian(state.year, state.month, 1);
+  const end = Jalali.toGregorian(state.year, state.month, days);
+
+  document.getElementById('info-year').textContent = String(state.year);
+  document.getElementById('info-month').textContent = MONTHS[state.month - 1];
+  document.getElementById('info-start').textContent =
+    `${start.gy}/${pad2(start.gm)}/${pad2(start.gd)}`;
+  document.getElementById('info-end').textContent =
+    `${end.gy}/${pad2(end.gm)}/${pad2(end.gd)}`;
+  document.getElementById('info-days').textContent = String(days);
+
+  const rate = totals.goal ? Math.min(1, totals.done / totals.goal) : 0;
+  document.getElementById('rate-big').textContent = Math.round(rate * 100) + '%';
+
+  const badge = document.getElementById('rate-badge');
+  let text = '—', color = '#71717A';
+  if (rate > 0.95) { text = '🏆 Excellent'; color = '#4ADE80'; }
+  else if (rate > 0.8) { text = '❤️ Good Job'; color = '#A7F3D0'; }
+  else if (rate > 0.5) { text = '✊ Do Better'; color = '#FCD34D'; }
+  else if (rate > 0.3) { text = '👎 Low Effort'; color = '#FDBA74'; }
+  else { text = '⚠️ Disaster'; color = '#FCA5A5'; }
+  badge.textContent = text;
+  badge.style.color = color;
+
+  document.getElementById('footer-total').textContent = `${totals.done} / ${totals.goal}`;
+}
+
+/* ============================================================ Wave */
+function buildSmoothPath(values, W, H, padTop, padBottom) {
+  const n = values.length; if (!n) return '';
+  const stepX = W / Math.max(1, n - 1);
+  const pts = values.map((v, i) => [i * stepX, padTop + (1 - v) * (H - padTop - padBottom)]);
+  let d = `M ${pts[0][0]},${pts[0][1]}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+    const c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = p1[1] + (p2[1] - p0[1]) / 6;
+    const c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = p2[1] - (p3[1] - p1[1]) / 6;
+    d += ` C ${c1x},${c1y} ${c2x},${c2y} ${p2[0]},${p2[1]}`;
+  }
+  return d;
+}
+
+function renderWave() {
+  const svg = document.getElementById('wave-svg');
+  const days = Jalali.jalaaliMonthLength(state.year, state.month);
+  const key = monthKey(state.year, state.month);
+  const rec = state.records[key] || {};
+  const totalHabits = Math.max(1, state.habits.length);
+
+  const values = [];
+  for (let d = 1; d <= days; d++) {
+    let done = 0;
+    for (const h of state.habits) if ((rec[h.id] || []).includes(d)) done++;
+    values.push(done / totalHabits);
+  }
+
+  const W = 1000, H = 190, padTop = 40, padBottom = 40;
+  const path = buildSmoothPath(values, W, H, padTop, padBottom);
+  const stepX = W / Math.max(1, days - 1);
+
+  let markers = '';
+  for (let i = 0; i < days; i++) {
+    const v = values[i];
+    const x = i * stepX;
+    const y = padTop + (1 - v) * (H - padTop - padBottom);
+    const label = v >= 0.999 ? '1' : v <= 0.001 ? '0' : '';
+    const labelY = v >= 0.5 ? y - 12 : y + 20;
+    if (label) {
+      markers += `<text x="${x}" y="${labelY}" text-anchor="middle"
+        font-family="'Times New Roman',serif" font-size="14" font-weight="700"
+        fill="${v >= 0.5 ? '#A7F3D0' : '#71717A'}">${label}</text>`;
+    }
+  }
+
+  const todayX = (state.today.jy === state.year && state.today.jm === state.month)
+    ? (state.today.jd - 1) * stepX : -100;
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="waveGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#10B981" stop-opacity=".35"/>
+        <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="waveGlow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    ${[0, 1, 2, 3, 4].map(i => {
+    const y = padTop + (H - padTop - padBottom) * (i / 4);
+    return `<line x1="0" y1="${y}" x2="${W}" y2="${y}"
+        stroke="#27272A" stroke-width="1" stroke-dasharray="2 6" opacity=".5"/>`;
+  }).join('')}
+    ${todayX > 0 ? `<line x1="${todayX}" y1="8" x2="${todayX}" y2="${H - 8}"
+      stroke="#8B5CF6" stroke-width="1" stroke-dasharray="4 4" opacity=".5"/>` : ''}
+    <path d="${path} L ${W},${H} L 0,${H} Z" fill="url(#waveGrad)" opacity=".6"/>
+    <path d="${path}" fill="none" stroke="#10B981" stroke-width="2.2"
+      stroke-linecap="round" stroke-linejoin="round" filter="url(#waveGlow)"/>
+    ${markers}
+  `;
+}
+
+/* ============================================================ Donuts */
+function drawDonut(svgEl, pct, color, valueLabel) {
+  const r = 46, c = 2 * Math.PI * r;
+  const clamped = Math.max(0, Math.min(1, pct));
+  const dash = clamped * c;
+  svgEl.innerHTML = `
+    <circle cx="60" cy="60" r="${r}" fill="none" stroke="#27272A" stroke-width="10"/>
+    <circle cx="60" cy="60" r="${r}" fill="none"
+      stroke="${color}" stroke-width="10" stroke-linecap="round"
+      stroke-dasharray="${dash} ${c}" transform="rotate(-90 60 60)"
+      style="filter:drop-shadow(0 0 6px ${color}66); transition:stroke-dasharray .5s ease;"/>
+    <text x="60" y="58" text-anchor="middle"
+      font-family="'Times New Roman',serif" font-size="18" font-weight="700"
+      fill="#FAFAFA" style="font-variant-numeric:tabular-nums">${valueLabel}</text>
+    <text x="60" y="74" text-anchor="middle"
+      font-family="'Libre Franklin',sans-serif" font-size="8"
+      fill="#71717A" letter-spacing="1">PROGRESS</text>
+  `;
+}
+
+function renderDonuts(totals) {
+  const days = Jalali.jalaaliMonthLength(state.year, state.month);
+  const key = monthKey(state.year, state.month);
+  const rec = state.records[key] || {};
+  const todayDay = (state.today.jy === state.year && state.today.jm === state.month)
+    ? state.today.jd : days;
+
+  const monthly = totals.goal ? Math.min(1, totals.done / totals.goal) : 0;
+  const pace = totals.goal / Math.max(1, days);
+  const actualPerDay = totals.done / Math.max(1, todayDay);
+  const daysNorm = pace ? Math.min(1, actualPerDay / pace) : 0;
+
+  const totalHabits = Math.max(1, state.habits.length);
+  let last3sum = 0;
+  for (let d = Math.max(1, todayDay - 2); d <= todayDay; d++) {
+    let c = 0;
+    for (const h of state.habits) if ((rec[h.id] || []).includes(d)) c++;
+    last3sum += c / totalHabits;
+  }
+  const last3 = last3sum / Math.min(3, todayDay);
+
+  drawDonut(document.querySelector('[data-id="donut-month"]'), monthly, '#EF4444',
+    Math.round(monthly * 1000) / 10 + '%');
+  drawDonut(document.querySelector('[data-id="donut-days"]'), daysNorm, '#0EA5E9',
+    Math.round(daysNorm * 1000) / 10 + '%');
+  drawDonut(document.querySelector('[data-id="donut-last"]'), last3, '#F59E0B',
+    Math.round(last3 * 1000) / 10 + '%');
+}
+
+/* ============================================================ Table */
+function renderTable() {
+  const days = Jalali.jalaaliMonthLength(state.year, state.month);
+  const key = monthKey(state.year, state.month);
+  const rec = state.records[key] || {};
+  const isCurrent = state.today.jy === state.year && state.today.jm === state.month;
+  const todayDay = isCurrent ? state.today.jd : -1;
+
+  const dh = document.getElementById('days-header');
+  let html = '';
+  for (let d = 1; d <= days; d++) {
+    const dow = dowLetterForJalaliDay(state.year, state.month, d);
+    const isToday = d === todayDay ? ' is-today' : '';
+    html += `<div class="day-head${isToday}">
+      <span class="num">${d}</span>
+      <span class="dow">${dow}</span>
+    </div>`;
+  }
+  dh.innerHTML = html;
+
+  document.getElementById('panel-count').textContent = `(${state.habits.length})`;
+
+  const list = document.getElementById('habit-list');
+  if (!state.habits.length) {
+    list.innerHTML = '';
+    document.getElementById('empty-state').classList.remove('hidden');
+    document.getElementById('table-wrap').classList.add('hidden');
+    document.getElementById('habit-foot').innerHTML = '';
+    return;
+  }
+  document.getElementById('empty-state').classList.add('hidden');
+  document.getElementById('table-wrap').classList.remove('hidden');
+
+  let rows = '';
+  state.habits.forEach((h, idx) => {
+    const color = colorFor(idx, h);
+    const checks = new Set(rec[h.id] || []);
+    const g = Math.max(1, Number(h.goal) || 1);
+    const done = Math.min(checks.size, g);
+    const progress = Math.min(1, checks.size / g);
+    const collapsed = state.compactAll || state.collapsed.has(h.id);
+    const initial = (h.name || '?').trim().charAt(0);
+
+    rows += `<div class="habit-row${collapsed ? ' is-collapsed' : ''}"
+                  data-id="${h.id}" style="--c:${color}">
+      <div class="col-habit">
+        <button class="habit-logo" data-action="toggle-collapse"
+                title="${collapsed ? 'باز کردن' : 'جمع کردن'}">${escapeHtml(initial)}</button>
+        <span class="habit-name" title="${escapeHtml(h.name)}">${escapeHtml(h.name)}</span>
+        <span class="habit-actions">
+          <button class="icon-btn" data-action="edit" title="ویرایش">✎</button>
+          <button class="icon-btn danger" data-action="delete" title="حذف">✕</button>
+        </span>
+      </div>
+      <div class="col-goal">${g}</div>
+      <div class="col-days" dir="ltr">`;
+
+    for (let d = 1; d <= days; d++) {
+      const checked = checks.has(d) ? 'true' : 'false';
+      const isToday = d === todayDay ? ' is-today' : '';
+      rows += `<button class="day-cell${isToday}" role="checkbox"
+        aria-checked="${checked}" data-habit="${h.id}" data-day="${d}"
+        aria-label="${escapeHtml(h.name)}، روز ${d}"><span class="day-box"></span></button>`;
+    }
+
+    rows += `</div>
+      <div class="col-progress">
+        <div class="progress-bar">
+          <div class="progress-fill${progress >= 1 ? ' is-full' : ''}"
+               style="width:${(progress * 100).toFixed(1)}%"></div>
+        </div>
+        <span class="progress-text">${done}/${g}</span>
+      </div>
+    </div>`;
+  });
+  list.innerHTML = rows;
+
+  const foot = document.getElementById('habit-foot');
+  let f = `<div class="col-habit">تکمیل روز</div><div class="col-goal"></div>
+           <div class="col-days" dir="ltr">`;
+  for (let d = 1; d <= days; d++) {
+    let count = 0;
+    for (const h of state.habits) if ((rec[h.id] || []).includes(d)) count++;
+    const isToday = d === todayDay ? ' is-today' : '';
+    f += `<div class="day-cell${isToday}" data-count="${count}"><span class="day-box"></span></div>`;
+  }
+  f += `</div><div class="col-progress"></div>`;
+  foot.innerHTML = f;
+}
+
+/* ============================================================ Totals */
+function computeTotals() {
+  const key = monthKey(state.year, state.month);
+  const rec = state.records[key] || {};
+  let done = 0, goal = 0;
+  for (const h of state.habits) {
+    const checks = rec[h.id] || [];
+    const g = Math.max(1, Number(h.goal) || 1);
+    goal += g;
+    done += Math.min(checks.length, g);
+  }
+  return { done, goal };
+}
+
+/* ============================================================ Views */
+function applyViews() {
+  document.getElementById('date-box').style.display = state.views.date ? '' : 'none';
+  document.getElementById('wave-box').style.display = state.views.wave ? '' : 'none';
+  document.getElementById('rate-box').style.display = state.views.rate ? '' : 'none';
+  document.getElementById('habits-panel').style.display = state.views.habits ? '' : 'none';
+  document.getElementById('donuts').style.display = state.views.donuts ? '' : 'none';
+
+  document.getElementById('panel-toggle')
+    .setAttribute('aria-expanded', state.panelOpen ? 'true' : 'false');
+
+  /* ✅ کلید تاریخ */
+  document.body.classList.toggle('hide-date', state.hideDate);
+  const tDate = document.getElementById('toggle-date');
+  if (tDate) tDate.checked = !state.hideDate;
+
+  /* ✅ کلید ستون عادت */
+  document.body.classList.toggle('hide-habit-col', state.hideHabitCol);
+  const tHabit = document.getElementById('toggle-habit-col');
+  if (tHabit) tHabit.checked = !state.hideHabitCol;
+}
+
+function render() {
+  const totals = computeTotals();
+  renderInfoAndRate(totals);
+  renderWave();
+  renderTable();
+  renderDonuts(totals);
+  applyViews();
+}
+
+/* ============================================================ Modal */
+function openModal(habit) {
+  document.getElementById('modal-title').textContent = habit ? 'ویرایش عادت' : 'افزودن عادت';
+  document.getElementById('habit-id').value = habit ? habit.id : '';
+  document.getElementById('habit-name').value = habit ? habit.name : '';
+  document.getElementById('habit-goal').value = habit ? habit.goal : 20;
+  const m = document.getElementById('modal');
+  m.classList.remove('hidden'); m.classList.add('flex');
+  setTimeout(() => document.getElementById('habit-name').focus(), 0);
+  state.editingId = habit ? habit.id : null;
+}
+function closeModal() {
+  const m = document.getElementById('modal');
+  m.classList.add('hidden'); m.classList.remove('flex');
+  state.editingId = null;
+}
+
+/* ============================================================ Control panel */
+const cmdPanel = document.getElementById('cmd-panel');
+function openCmd() { cmdPanel.classList.add('is-open'); cmdPanel.setAttribute('aria-hidden', 'false'); }
+function closeCmd() { cmdPanel.classList.remove('is-open'); cmdPanel.setAttribute('aria-hidden', 'true'); }
+function toggleCmd() {
+  cmdPanel.classList.contains('is-open') ? closeCmd() : openCmd();
+}
+
+/* ============================================================ Events */
+document.addEventListener('click', async (e) => {
+  const cell = e.target.closest('.day-cell');
+  if (cell && cell.dataset.habit) {
+    const habitId = cell.dataset.habit;
+    const day = Number(cell.dataset.day);
+    const key = monthKey(state.year, state.month);
+    if (!state.records[key]) state.records[key] = {};
+    if (!state.records[key][habitId]) state.records[key][habitId] = [];
+    const arr = state.records[key][habitId];
+    const idx = arr.indexOf(day);
+    if (idx >= 0) arr.splice(idx, 1); else arr.push(day);
+    render();
+    api.toggle(key, habitId, day).catch(console.error);
+    return;
+  }
+
+  const action = e.target.closest('[data-action]');
+  if (action) {
+    const id = action.closest('.habit-row')?.dataset.id;
+    if (!id) return;
+    const h = state.habits.find((x) => x.id === id);
+    if (!h) return;
+    if (action.dataset.action === 'toggle-collapse') {
+      if (state.compactAll) { state.compactAll = false; state.collapsed.clear(); }
+      else if (state.collapsed.has(id)) state.collapsed.delete(id);
+      else state.collapsed.add(id);
+      localStorage.setItem(LS.collapsed, JSON.stringify([...state.collapsed]));
+      render(); return;
+    }
+    if (action.dataset.action === 'edit') { openModal(h); return; }
+    if (action.dataset.action === 'delete') {
+      if (confirm(`عادت «${h.name}» حذف بشه؟`)) {
+        await api.deleteHabit(id);
+        state.habits = state.habits.filter((x) => x.id !== id);
+        state.collapsed.delete(id);
+        localStorage.setItem(LS.collapsed, JSON.stringify([...state.collapsed]));
+        render();
+      }
+      return;
+    }
+  }
+
+  /* panel toggle (accordion) */
+  if (e.target.closest('#panel-toggle')) {
+    state.panelOpen = !state.panelOpen;
+    localStorage.setItem(LS.panelOpen, state.panelOpen ? '1' : '0');
+    applyViews();
+    return;
+  }
+
+  /* add */
+  if (e.target.closest('#add-habit') || e.target.closest('#add-first')) { openModal(null); return; }
+  if (e.target.closest('#cancel')) closeModal();
+  if (e.target.id === 'modal') closeModal();
+
+  /* control panel */
+  if (e.target.closest('#cmd-toggle')) { toggleCmd(); return; }
+  if (e.target.closest('#cmd-close')) { closeCmd(); return; }
+  if (cmdPanel.classList.contains('is-open')
+    && !e.target.closest('#cmd-panel')
+    && !e.target.closest('#cmd-toggle')) {
+    closeCmd();
+  }
+});
+
+document.getElementById('date-box-check').addEventListener('change', (e) => {
+  state.dateHidden = !e.target.checked;
+  localStorage.setItem(LS.dateHidden, state.dateHidden ? '1' : '0');
+  applyViews();
+});
+
+document.querySelectorAll('[data-view]').forEach((el) => {
+  el.addEventListener('change', () => {
+    state.views[el.getAttribute('data-view')] = el.checked;
+    localStorage.setItem(LS.views, JSON.stringify(state.views));
+    applyViews();
+  });
+});
+
+document.getElementById('cmd-compact-all').addEventListener('change', (e) => {
+  state.compactAll = e.target.checked;
+  render();
+});
+
+document.getElementById('cmd-no-orbit').addEventListener('change', (e) => {
+  document.body.classList.toggle('no-orbit', e.target.checked);
+});
+
+document.getElementById('cmd-mouse-glow').addEventListener('change', (e) => {
+  document.body.classList.toggle('no-mouse', !e.target.checked);
+});
+
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault(); toggleCmd(); return;
+  }
+  if (e.key === 'Escape') {
+    if (!document.getElementById('modal').classList.contains('hidden')) closeModal();
+    else if (cmdPanel.classList.contains('is-open')) closeCmd();
+  }
+});
+
+document.addEventListener('mousemove', (e) => {
+  const r = document.documentElement;
+  r.style.setProperty('--mx', e.clientX + 'px');
+  r.style.setProperty('--my', e.clientY + 'px');
+});
+
+document.getElementById('habit-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('habit-name').value.trim();
+  const goal = Number(document.getElementById('habit-goal').value);
+  if (!name) return;
+  const id = document.getElementById('habit-id').value;
+  if (id) {
+    await api.updateHabit(id, name, goal);
+    const h = state.habits.find((x) => x.id === id);
+    if (h) { h.name = name; h.goal = goal; }
+  } else {
+    const res = await api.addHabit(name, goal);
+    if (res && res.habit) state.habits.push(res.habit);
+  }
+  closeModal();
+  render();
+});
+/* ---------- کلید تاریخ ---------- */
+document.getElementById('toggle-date').addEventListener('change', (e) => {
+  state.hideDate = !e.target.checked;
+  localStorage.setItem('habit.hideDate', state.hideDate ? '1' : '0');
+  applyViews();
+});
+
+/* ---------- کلید ستون عادت ---------- */
+document.getElementById('toggle-habit-col').addEventListener('change', (e) => {
+  state.hideHabitCol = !e.target.checked;
+  localStorage.setItem('habit.hideHabitCol', state.hideHabitCol ? '1' : '0');
+  applyViews();
+});
+/* ============================================================ Init */
+(async function init() {
+  await loadIcons();
+  applyIcons();
+
+  const now = new Date();
+  const j = Jalali.toJalaali(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  state.today = j;
+  state.year = j.jy;
+  state.month = j.jm;
+
+  const data = await api.getData();
+  state.habits = data.habits || [];
+  state.records = data.records || {};
+
+  buildSelectors();
+  render();
+})().catch((err) => {
+  console.error(err);
+  document.body.innerHTML =
+    `<div style="padding:32px;direction:rtl;color:#fca5a5;font-family:Vazirmatn">
+       خطا در بارگذاری: ${err.message}
+     </div>`;
+});
+</file>
+
+<file path="public/index.html">
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#09090B">
+  <title>ردیاب ماهانه</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#27272A', 'primary-hover': '#18181B',
+            secondary: '#8B5CF6', 'secondary-hover': '#7C3AED',
+            success: '#16A34A', warning: '#D97706', danger: '#DC2626',
+            bg0: '#09090B', bg1: '#111113', bg2: '#18181B', bg3: '#27272A',
+            line1: '#27272A', line2: '#3F3F46',
+            fg1: '#FAFAFA', fg2: '#A1A1AA', fg3: '#71717A',
+          },
+          fontFamily: {
+            sans: ['Vazirmatn', 'Inter', 'system-ui', 'sans-serif'],
+            num: ['"Times New Roman"', 'Times', 'serif'],
+            en: ['"Libre Franklin"', '"Franklin Gothic Medium"', '"Franklin Gothic"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300..900&family=Libre+Franklin:wght@400;500;600;700;800;900&family=Inter:wght@300..900&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body class="min-h-screen bg-bg0 text-fg1 font-sans antialiased">
+
+  <div class="bg-orbit" aria-hidden="true"></div>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-mouse" id="bg-mouse" aria-hidden="true"></div>
+
+  <div class="relative z-10 mx-auto max-w-[1500px] px-4 md:px-6 py-5 flex flex-col gap-4">
+
+    <!-- ─── TOP BAR ─── -->
+    <header class="flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-baseline gap-3">
+        <h1 class="text-xl md:text-2xl font-bold tracking-tight">ردیاب عادت ماهانه</h1>
+        <span class="en hidden md:inline text-[10px] font-mono font-semibold tracking-[0.2em] text-fg3 uppercase">Levels
+          / Habit Tracker</span>
+      </div>
+
+     <div class="flex items-end gap-2 flex-wrap">
+  <label class="flex flex-col gap-1">
+    <span class="en text-[10px] font-mono uppercase tracking-widest text-fg3">سال</span>
+    <select id="year-select"
+      class="num h-9 min-w-[100px] rounded-md border border-line2 bg-bg2 px-3 text-base text-fg1 outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25 transition"></select>
+  </label>
+  <label class="flex flex-col gap-1">
+    <span class="en text-[10px] font-mono uppercase tracking-widest text-fg3">ماه</span>
+    <select id="month-select"
+      class="h-9 min-w-[130px] rounded-md border border-line2 bg-bg2 px-3 text-sm text-fg1 outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25 transition"></select>
+  </label>
+
+  <!-- ✅ کلید باکس تاریخ -->
+  <label class="toolbar-switch" title="نمایش/مخفی باکس تاریخ">
+    <input type="checkbox" id="toggle-date" checked>
+    <span class="ts-track"><span class="ts-thumb"></span></span>
+    <span class="ts-label">تاریخ</span>
+  </label>
+
+  <!-- ✅ کلید ستون عادت -->
+  <label class="toolbar-switch" title="نمایش/مخفی ستون عادت">
+    <input type="checkbox" id="toggle-habit-col" checked>
+    <span class="ts-track"><span class="ts-thumb"></span></span>
+    <span class="ts-label">ستون عادت</span>
+  </label>
+
+  <button id="cmd-toggle"
+    class="h-9 px-3 rounded-md border border-line2 bg-bg2 text-sm text-fg2 hover:bg-bg3 hover:text-fg1 transition flex items-center gap-2"
+    title="پنل کنترل (Ctrl+K)">
+    <span data-icon="settings" class="icon-16"></span>
+    <span class="en hidden sm:inline text-[11px] font-semibold tracking-wider">CONTROL</span>
+  </button>
+</div>
+    </header>
+
+    <!-- ─── HERO ─── -->
+    <section id="hero" class="grid grid-cols-1 lg:grid-cols-[260px_1fr_200px] gap-4 items-stretch">
+
+      <!-- Date box with checkbox -->
+      <div id="date-box" class="date-card">
+     
+
+        <div class="date-inner">
+          <div class="date-row">
+            <span class="en date-key">سال</span>
+            <span class="num date-val" id="info-year">—</span>
+          </div>
+          <div class="date-row">
+            <span class="en date-key">ماه</span>
+            <span class="date-val" id="info-month">—</span>
+          </div>
+          <div class="date-sep"></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <div class="en date-key">شروع</div>
+              <div class="num date-sub" id="info-start">—</div>
+            </div>
+            <div>
+              <div class="en date-key">پایان</div>
+              <div class="num date-sub" id="info-end">—</div>
+            </div>
+          </div>
+          <div class="date-row">
+            <span class="en date-key">تعداد روز</span>
+            <span class="num date-val" id="info-days">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wave -->
+      <div id="wave-box"
+        class="relative rounded-lg border border-line1 bg-bg2/50 backdrop-blur overflow-hidden min-h-[190px]">
+        <div class="en absolute top-2 right-3 text-[10px] font-semibold tracking-[0.2em] text-fg3 z-10 uppercase">
+          Trend / این ماه
+        </div>
+        <svg id="wave-svg" class="w-full h-[190px]" viewBox="0 0 1000 190" preserveAspectRatio="none"></svg>
+      </div>
+
+      <!-- Success rate -->
+      <div id="rate-box"
+        class="rounded-lg border border-line1 bg-bg2/70 backdrop-blur p-4 flex flex-col justify-between">
+        <div class="en text-[10px] font-semibold tracking-[0.2em] text-fg3 uppercase">Success Rate</div>
+        <div class="num text-5xl font-bold tabular-nums leading-none" id="rate-big">0%</div>
+        <div id="rate-badge" class="en text-sm font-bold tracking-wide">—</div>
+      </div>
+    </section>
+
+    <!-- ─── HABITS PANEL (accordion) ─── -->
+    <section id="habits-panel" class="rounded-lg border border-line1 bg-bg1/60 backdrop-blur overflow-hidden">
+
+      <div class="panel-head">
+        <button id="panel-toggle"
+          class="flex-1 flex items-center gap-2 py-3 px-4 hover:bg-white/[.02] transition text-right"
+          aria-expanded="true">
+          <span data-icon="chevron" class="chev icon-16"></span>
+          <h2 class="text-base font-semibold">عادت‌ها</h2>
+          <span class="num text-xs text-fg3" id="panel-count">(0)</span>
+        </button>
+        <button id="add-habit"
+          class="m-3 h-9 px-3 rounded-md bg-secondary text-white text-sm font-medium hover:bg-secondary-hover transition flex items-center gap-1.5">
+          <span data-icon="plus" class="icon-14"></span>
+          افزودن
+        </button>
+      </div>
+
+      <div id="panel-body" class="panel-body">
+        <div id="table-wrap" class="w-full overflow-x-auto custom-scroll">
+          <div class="min-w-max">
+            <div class="habit-head">
+              <div class="col-habit"><span
+                  class="en text-[10px] font-semibold tracking-widest text-fg3 uppercase">Habit</span></div>
+              <div class="col-goal"><span
+                  class="en text-[10px] font-semibold tracking-widest text-fg3 uppercase">Goal</span></div>
+              <div class="col-days" id="days-header"></div>
+              <div class="col-progress"><span
+                  class="en text-[10px] font-semibold tracking-widest text-fg3 uppercase">Progress</span></div>
+            </div>
+            <div id="habit-list"></div>
+            <div id="habit-foot" class="habit-row habit-foot"></div>
+          </div>
+        </div>
+
+        <div id="empty-state" class="hidden px-6 py-10 text-center text-fg3">
+          <p class="mb-3">هنوز عادتی اضافه نکردی.</p>
+          <button id="add-first"
+            class="h-9 px-4 rounded-md bg-secondary text-white text-sm font-medium hover:bg-secondary-hover transition">
+            افزودن اولین عادت
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── DONUTS ─── -->
+    <section id="donuts" class="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-center">
+      <div class="donut-card">
+        <svg class="donut" viewBox="0 0 120 120" data-id="donut-month"></svg>
+        <div class="donut-side">
+          <div class="en donut-label">MONTHLY<br>PROGRESS</div>
+        </div>
+      </div>
+      <div class="donut-card">
+        <svg class="donut" viewBox="0 0 120 120" data-id="donut-days"></svg>
+        <div class="donut-side">
+          <div class="en donut-label">DAYS<br>NORMALIZED</div>
+        </div>
+      </div>
+      <div class="donut-card">
+        <svg class="donut" viewBox="0 0 120 120" data-id="donut-last"></svg>
+        <div class="donut-side">
+          <div class="en donut-label">LAST 3 DAYS<br>MOMENTUM</div>
+        </div>
+      </div>
+      <div class="text-left md:text-right leading-[0.95] font-black tracking-tight">
+        <div class="en text-3xl md:text-4xl text-fg1">MONTHLY</div>
+        <div class="en text-3xl md:text-4xl text-fg1">HABIT</div>
+        <div class="en text-3xl md:text-4xl text-fg3">TRACKER</div>
+      </div>
+    </section>
+
+    <div class="text-center text-xs text-fg3 tabular-nums pb-4">
+      <span class="num" id="footer-total">0 / 0</span>
+      <span class="en ml-2 tracking-widest uppercase">Completed</span>
+    </div>
+  </div>
+
+  <!-- ─── CONTROL PANEL ─── -->
+  <aside id="cmd-panel" class="cmd-panel" aria-hidden="true">
+    <div class="cmd-head">
+      <div class="en text-[10px] font-semibold tracking-[0.25em] text-fg3 uppercase">Control Panel</div>
+      <button id="cmd-close" class="icon-btn" aria-label="بستن">✕</button>
+    </div>
+
+    <div class="cmd-section">
+      <div class="en cmd-label">VIEWS</div>
+      <label class="cmd-row"><span>باکس تاریخ</span><input type="checkbox" data-view="date" checked></label>
+      <label class="cmd-row"><span>نمودار سینوسی</span><input type="checkbox" data-view="wave" checked></label>
+      <label class="cmd-row"><span>نرخ موفقیت</span><input type="checkbox" data-view="rate" checked></label>
+      <label class="cmd-row"><span>لیست عادت‌ها</span><input type="checkbox" data-view="habits" checked></label>
+      <label class="cmd-row"><span>دونات‌ها</span><input type="checkbox" data-view="donuts" checked></label>
+    </div>
+
+    <div class="cmd-section">
+      <div class="en cmd-label">MODE</div>
+      <label class="cmd-row"><span>فشرده کردن همه</span><input type="checkbox" id="cmd-compact-all"></label>
+      <label class="cmd-row"><span>حذف پس‌زمینه چرخشی</span><input type="checkbox" id="cmd-no-orbit"></label>
+      <label class="cmd-row"><span>هاله‌ی موس</span><input type="checkbox" id="cmd-mouse-glow" checked></label>
+    </div>
+
+    <div class="en cmd-hint">Ctrl / Cmd + K</div>
+  </aside>
+
+  <!-- ─── MODAL ─── -->
+  <div id="modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="w-full max-w-md rounded-lg border border-line1 bg-bg2 p-6 shadow-2xl">
+      <h3 id="modal-title" class="mb-4 text-lg font-semibold">افزودن عادت</h3>
+      <form id="habit-form" class="flex flex-col gap-4">
+        <input type="hidden" id="habit-id">
+        <label class="flex flex-col gap-1.5">
+          <span class="text-xs text-fg2">نام عادت</span>
+          <input type="text" id="habit-name" required maxlength="80" placeholder="مثلاً: ورزش صبحگاهی ۵ دقیقه"
+            class="h-10 rounded-md border border-line2 bg-bg1 px-3 text-sm text-fg1 outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25 transition">
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="text-xs text-fg2">هدف ماهانه (تعداد دفعات)</span>
+          <input type="number" id="habit-goal" required min="1" max="31" value="20"
+            class="num h-10 rounded-md border border-line2 bg-bg1 px-3 text-base text-fg1 outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25 transition">
+        </label>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="cancel"
+            class="h-9 px-4 rounded-md border border-line2 text-sm text-fg2 hover:bg-bg3 hover:text-fg1 transition">انصراف</button>
+          <button type="submit"
+            class="h-9 px-4 rounded-md bg-secondary text-white text-sm font-medium hover:bg-secondary-hover transition">ذخیره</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+
+</html>
+</file>
+
+<file path="public/style.css">
+/* ============================================================
+   Levels — Dark · Minimal · Live
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: 'Vazirmatn','Inter',system-ui,sans-serif; }
+
+/* ---------- Fonts ---------- */
+.num, .tabular-nums, input[type="number"] {
+  font-family: 'Times New Roman','Times','Liberation Serif',serif !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .01em;
+}
+.en, [lang="en"] {
+  font-family: 'Libre Franklin','Franklin Gothic Medium','Franklin Gothic','Inter',sans-serif;
+}
+
+/* ---------- Live backgrounds ---------- */
+.bg-orbit {
+  position: fixed; inset: -30%; z-index: 0; pointer-events: none;
+  background: conic-gradient(from 0deg at 50% 50%,
+    rgba(139,92,246,.18) 0deg,
+    rgba(14,165,233,.10) 90deg,
+    rgba(16,185,129,.10) 180deg,
+    rgba(245,158,11,.07) 270deg,
+    rgba(139,92,246,.18) 360deg);
+  filter: blur(120px);
+  animation: spin 60s linear infinite;
+  opacity: .85; transition: opacity .4s;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+body.no-orbit .bg-orbit { opacity: 0; }
+
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+}
+.bg-mouse {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(600px circle at var(--mx,50%) var(--my,50%),
+    rgba(139,92,246,.07), transparent 60%);
+  transition: opacity .4s;
+}
+body.no-mouse .bg-mouse { opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) { .bg-orbit { animation: none; } }
+
+/* ---------- Scrollbar ---------- */
+.custom-scroll::-webkit-scrollbar { height: 8px; }
+.custom-scroll::-webkit-scrollbar-track { background: #111113; }
+.custom-scroll::-webkit-scrollbar-thumb { background: #3F3F46; border-radius: 4px; }
+.custom-scroll::-webkit-scrollbar-thumb:hover { background: #52525B; }
+
+/* ---------- Icon helpers ---------- */
+.icon-16, [data-icon] { width: 16px; height: 16px; display: inline-block; flex: 0 0 auto; }
+.icon-14 { width: 14px; height: 14px; display: inline-block; }
+[data-icon] svg { width: 100%; height: 100%; display: block; }
+
+/* ---------- Date card with checkbox ---------- */
+.date-card {
+  position: relative;
+  border: 1px solid #27272A;
+  background: rgba(24,24,27,.70);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 10px;
+  transition: min-height .35s ease, padding .35s ease;
+  min-height: 200px;
+}
+.date-card.is-hidden {
+  min-height: 44px; padding: 8px 12px; overflow: hidden;
+}
+.date-card.is-hidden .date-inner { opacity: 0; pointer-events: none; }
+
+.date-inner { display: flex; flex-direction: column; gap: 10px; transition: opacity .25s; }
+.date-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.date-key {
+  font-size: 10px; text-transform: uppercase; letter-spacing: .1em;
+  color: #71717A; font-family: 'JetBrains Mono', monospace;
+}
+.date-val { font-size: 20px; font-weight: 700; color: #FAFAFA; line-height: 1; }
+.date-sub { font-size: 12px; color: #A1A1AA; margin-top: 2px; }
+.date-sep { height: 1px; background: #27272A; margin: 2px 0; }
+
+.date-check { position: absolute; top: 10px; left: 10px; cursor: pointer; z-index: 2; }
+.date-check input { position: absolute; opacity: 0; pointer-events: none; }
+.check-ui {
+  width: 18px; height: 18px; border-radius: 4px;
+  border: 1.5px solid #3F3F46;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #18181B; transition: background .15s, border-color .15s;
+  position: relative;
+}
+.date-check input:checked + .check-ui { background: #8B5CF6; border-color: #8B5CF6; }
+.date-check input:checked + .check-ui::after {
+  content: ''; width: 9px; height: 5px;
+  border-left: 2px solid #fff; border-bottom: 2px solid #fff;
+  transform: rotate(-45deg) translateY(-1px);
+}
+.date-check input:focus-visible + .check-ui { outline: 2px solid #8B5CF6; outline-offset: 2px; }
+
+/* ---------- Habits panel (accordion) ---------- */
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid #1C1C20;
+}
+.panel-head #panel-toggle { cursor: pointer; border: none; background: transparent; color: inherit; font-family: inherit; }
+.panel-head .chev { transition: transform .25s; }
+.panel-head #panel-toggle[aria-expanded="false"] .chev { transform: rotate(-90deg); }
+
+.panel-body {
+  max-height: 4000px; overflow: hidden;
+  transition: max-height .45s cubic-bezier(.4,0,.2,1), opacity .25s;
+  opacity: 1;
+}
+#panel-toggle[aria-expanded="false"] ~ .panel-body,
+.panel-head:has(#panel-toggle[aria-expanded="false"]) + .panel-body {
+  max-height: 0; opacity: 0;
+}
+
+/* ---------- Table ---------- */
+.habit-head, .habit-row {
+  display: grid;
+  grid-template-columns: 240px 60px 1fr 108px;
+  align-items: center;
+  min-height: 38px;
+  border-bottom: 1px solid #1C1C20;
+}
+.habit-head {
+  position: sticky; top: 0; z-index: 5;
+  background: #18181B; border-bottom: 1px solid #27272A; min-height: 34px;
+}
+.habit-head > div {
+  height: 100%; display: flex; align-items: center;
+  padding: 0 12px; font-size: 11px;
+}
+.habit-head .col-goal { justify-content: center; }
+.habit-head .col-progress { justify-content: flex-end; }
+.habit-row:hover { background: rgba(255,255,255,.02); }
+
+.col-days { display: flex; align-items: center; overflow: hidden; min-height: 38px; padding: 0 4px; }
+.col-days .day-head {
+  flex: 0 0 34px; width: 34px; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: #71717A; line-height: 1; gap: 2px;
+}
+.col-days .day-head .num { color: #A1A1AA; font-weight: 500; font-size: 12px; }
+.col-days .day-head .dow { color: #52525B; font-size: 9px; }
+.col-days .day-head.is-today .num { color: #8B5CF6; }
+.col-days .day-head.is-today { background: rgba(139,92,246,.10); border-radius: 4px; }
+
+/* ---------- Habit cell ---------- */
+.col-habit {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 12px; min-width: 0;
+  position: sticky; right: 0; z-index: 3; background: inherit;
+}
+.habit-head .col-habit { background: #18181B; z-index: 6; }
+
+.habit-logo {
+  flex: 0 0 auto; width: 22px; height: 22px;
+  border-radius: 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  border: none; cursor: pointer;
+  background: color-mix(in oklab, var(--c, #8B5CF6) 22%, transparent);
+  color: var(--c, #8B5CF6);
+  transition: transform .15s, background .15s;
+}
+.habit-logo:hover { transform: scale(1.1); }
+
+.habit-name {
+  flex: 1 1 auto; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: 13px; font-weight: 500; color: #FAFAFA;
+}
+.habit-actions { flex: 0 0 auto; display: flex; gap: 2px; opacity: 0; transition: opacity .15s; }
+.habit-row:hover .habit-actions { opacity: 1; }
+.icon-btn {
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none; background: transparent; border-radius: 4px;
+  color: #A1A1AA; font-size: 12px; cursor: pointer;
+}
+.icon-btn:hover { background: #27272A; color: #FAFAFA; }
+.icon-btn.danger:hover { background: rgba(220,38,38,.15); color: #FCA5A5; }
+
+.col-goal {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: #A1A1AA; font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Day cells ---------- */
+.day-cell {
+  flex: 0 0 34px; width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; margin: 0; background: transparent; border: none;
+  cursor: pointer; transition: transform .1s;
+}
+.day-cell:hover .day-box { border-color: var(--c, #8B5CF6); }
+.day-cell:active { transform: scale(.94); }
+.day-box {
+  width: 22px; height: 22px; border-radius: 4px;
+  border: 1px dashed #3F3F46;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; font-weight: 700; color: transparent;
+  transition: background .12s, border-color .12s, color .12s, box-shadow .15s;
+}
+.day-cell[aria-checked="true"] .day-box {
+  background: color-mix(in oklab, var(--c, #8B5CF6) 22%, transparent);
+  border: 1px solid var(--c, #8B5CF6);
+  color: var(--c, #8B5CF6);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--c, #8B5CF6) 30%, transparent),
+              0 0 12px color-mix(in oklab, var(--c, #8B5CF6) 25%, transparent);
+}
+.day-cell[aria-checked="true"] .day-box::before { content: '✕'; }
+.day-cell.is-today .day-box { border-color: #8B5CF6; }
+
+/* ---------- Progress ---------- */
+.col-progress {
+  display: flex; flex-direction: column;
+  align-items: flex-end; justify-content: center;
+  gap: 3px; padding: 0 12px; min-height: 38px;
+}
+.progress-bar {
+  width: 100%; height: 3px;
+  background: #27272A; border-radius: 999px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, #8B5CF6, #A78BFA);
+  border-radius: 999px; transition: width .35s;
+}
+.progress-fill.is-full { background: linear-gradient(90deg, #16A34A, #22C55E); }
+.progress-text {
+  font-family: 'Times New Roman', serif;
+  font-size: 11px; color: #A1A1AA; font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Footer row ---------- */
+.habit-foot { border-top: 1px solid #27272A; background: #111113; }
+.habit-foot .col-habit {
+  justify-content: flex-start;
+  font-size: 12px; font-weight: 500;
+  color: #A1A1AA; padding: 0 12px;
+}
+.habit-foot .day-cell { cursor: default; }
+.habit-foot .day-cell .day-box {
+  background: transparent; border: 1px dashed #2A2A2E;
+  color: #71717A; font-weight: 500;
+}
+.habit-foot .day-cell .day-box::before {
+  content: attr(data-count);
+  font-family: 'Times New Roman', serif;
+  font-size: 11px;
+}
+.habit-foot .day-cell[data-count="0"] .day-box::before { content: '—'; color: #3F3F46; }
+
+/* ---------- Donuts ---------- */
+.donut-card {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px;
+  background: rgba(24,24,27,.55);
+  border: 1px solid #27272A; border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+.donut { width: 92px; height: 92px; flex: 0 0 auto; }
+.donut-side { flex: 1 1 auto; min-width: 0; }
+.donut-label {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: .14em; line-height: 1.35; color: #A1A1AA;
+}
+
+/* ---------- Control panel ---------- */
+.cmd-panel {
+  position: fixed; top: 72px; left: 16px;
+  width: 280px;
+  background: rgba(24,24,27,.92);
+  border: 1px solid #27272A; border-radius: 12px;
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  padding: 14px;
+  display: flex; flex-direction: column; gap: 12px;
+  transform-origin: top left;
+  transform: scale(.95); opacity: 0; pointer-events: none;
+  transition: transform .18s cubic-bezier(.4,0,.2,1), opacity .18s;
+  z-index: 40;
+}
+.cmd-panel.is-open { transform: scale(1); opacity: 1; pointer-events: auto; }
+.cmd-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-bottom: 8px; border-bottom: 1px solid #27272A;
+}
+.cmd-section { display: flex; flex-direction: column; gap: 2px; }
+.cmd-label {
+  font-size: 10px; text-transform: uppercase;
+  letter-spacing: .12em; color: #52525B;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 6px 4px 4px;
+}
+.cmd-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 7px 8px; border-radius: 6px;
+  font-size: 12px; color: #D4D4D8;
+  cursor: pointer; transition: background .12s;
+}
+.cmd-row:hover { background: rgba(255,255,255,.04); }
+.cmd-row input[type="checkbox"] {
+  appearance: none;
+  width: 30px; height: 18px;
+  background: #27272A; border-radius: 999px;
+  position: relative; transition: background .15s;
+  cursor: pointer; flex: 0 0 auto;
+}
+.cmd-row input[type="checkbox"]::after {
+  content: ''; position: absolute; top: 2px; right: 2px;
+  width: 14px; height: 14px;
+  background: #A1A1AA; border-radius: 50%;
+  transition: transform .15s, background .15s;
+}
+.cmd-row input[type="checkbox"]:checked { background: #8B5CF6; }
+.cmd-row input[type="checkbox"]:checked::after { transform: translateX(-12px); background: #fff; }
+.cmd-hint {
+  text-align: center; font-size: 9px; letter-spacing: .15em;
+  color: #52525B; padding-top: 8px; border-top: 1px solid #27272A;
+}
+
+/* ---------- Focus ---------- */
+:focus-visible { outline: 2px solid #8B5CF6; outline-offset: 2px; border-radius: 4px; }
+.day-cell:focus-visible .day-box { border-color: #8B5CF6; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .habit-head, .habit-row { grid-template-columns: 190px 48px 1fr 84px; }
+  .habit-name { font-size: 12px; }
+  .donut-card { padding: 12px; gap: 10px; }
+  .donut { width: 72px; height: 72px; }
+  .cmd-panel { top: 60px; left: 8px; width: calc(100vw - 16px); max-width: 320px; }
+}
+@media (max-width: 640px) {
+  .habit-head, .habit-row { grid-template-columns: 150px 40px 1fr 70px; }
+  .col-days .day-head, .day-cell { flex-basis: 28px; width: 28px; }
+  .day-box { width: 20px; height: 20px; font-size: 11px; }
+}
+/* ============================================================
+   Persian typography — بولد و کلفت
+   ============================================================ */
+html, body {
+  font-family: 'Vazirmatn','Inter',system-ui,sans-serif;
+  font-weight: 500;
+}
+h1, h2, h3 { font-weight: 800 !important; }
+button, label, .panel-head h2, .date-val, .date-key, .date-sub,
+.habit-name, .cmd-row, .cmd-label, .cmd-hint, .progress-text,
+.col-goal, .donut-label, .stat-label { font-weight: 700; }
+.date-val { font-weight: 800; }
+.habit-name { font-weight: 700; }
+.habit-foot .col-habit { font-weight: 700; }
+.ts-label { font-weight: 700; }
+
+/* ============================================================
+   Toolbar switches — کلید خاموش/روشن
+   ============================================================ */
+.toolbar-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid #3F3F46;
+  background: #18181B;
+  color: #A1A1AA;
+  font-size: 12px;
+  font-family: 'Vazirmatn', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.toolbar-switch:hover { background: #27272A; color: #FAFAFA; }
+.toolbar-switch input { position: absolute; opacity: 0; pointer-events: none; }
+
+.ts-track {
+  position: relative;
+  width: 28px; height: 16px;
+  background: #3F3F46;
+  border-radius: 999px;
+  transition: background .18s;
+  flex: 0 0 auto;
+}
+.ts-thumb {
+  position: absolute;
+  top: 2px; right: 2px;
+  width: 12px; height: 12px;
+  background: #A1A1AA;
+  border-radius: 50%;
+  transition: transform .18s, background .18s;
+}
+.toolbar-switch input:checked + .ts-track { background: #8B5CF6; }
+.toolbar-switch input:checked + .ts-track .ts-thumb {
+  transform: translateX(-12px);
+  background: #FFFFFF;
+}
+.toolbar-switch input:checked ~ .ts-label { color: #FAFAFA; }
+.toolbar-switch input:focus-visible + .ts-track {
+  outline: 2px solid #8B5CF6; outline-offset: 2px;
+}
+
+/* ============================================================
+   Hide date box
+   ============================================================ */
+body.hide-date #date-box { display: none !important; }
+@media (min-width: 1024px) {
+  body.hide-date #hero {
+    grid-template-columns: 1fr 200px !important;
+  }
+}
+
+/* ============================================================
+   Hide habit column
+   ============================================================ */
+body.hide-habit-col .col-habit { display: none !important; }
+body.hide-habit-col .habit-head,
+body.hide-habit-col .habit-row {
+  grid-template-columns: 60px 1fr 108px !important;
+}
+@media (max-width: 900px) {
+  body.hide-habit-col .habit-head,
+  body.hide-habit-col .habit-row {
+    grid-template-columns: 48px 1fr 84px !important;
+  }
+}
+@media (max-width: 640px) {
+  body.hide-habit-col .habit-head,
+  body.hide-habit-col .habit-row {
+    grid-template-columns: 40px 1fr 70px !important;
+  }
+}
+</file>
+
+<file path="data.json">
+{
+  "habits": [
+    {
+      "id": "hmvae0dgx",
+      "name": "ورزش صبح گاهی",
+      "goal": 21
+    },
+    {
+      "id": "hmvae0xg0",
+      "name": "19 دقیقه خواندن کتاب مالی",
+      "goal": 19
+    }
+  ]
+}
+</file>
+
+<file path="package.json">
+{
+  "name": "habit-tracker-fa",
+  "version": "1.0.0",
+  "description": "ردیاب عادت ماهانه شمسی",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "koa": "^2.15.3",
+    "koa-bodyparser": "^4.4.1",
+    "koa-router": "^12.0.1",
+    "koa-static": "^5.0.0",
+    "thesvg": "latest"
+  },
+  "engines": { "node": ">=18" }
+}
+</file>
+
+<file path="README.md">
+# ردیاب عادت ماهانه (شمسی)
+
+## اجرا
+
+```bash
+npm install
+npm start
+```
+
+سپس در مرورگر باز کن: http://localhost:3000
+
+## اجرا با احراز هویت (توصیه می‌شود برای سرور عمومی)
+
+```bash
+AUTH_USER=me AUTH_PASS=mysecret npm start
+```
+
+## دیپلوی روی سرور
+
+### Linux + pm2
+```bash
+npm i -g pm2
+pm2 start server.js --name habit --update-env
+pm2 save && pm2 startup
+```
+
+### Docker (اختیاری)
+```dockerfile
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY . .
+EXPOSE 3000
+CMD ["node", "server.js"]
+```
+
+### Render / Railway / Fly.io
+فقط مخزن را وصل کن، دستور شروع `npm start`، متغیر `PORT` خودکار ست می‌شود.
+
+## داده‌ها
+
+همه چیز در فایل `data.json` کنار سرور ذخیره می‌شود. برای بکاپ، همین فایل را کپی کن.
+
+ساختار:
+```json
+{
+  "habits": [{ "id": "h...", "name": "ورزش صبح", "goal": 20 }],
+  "records": { "1403-07": { "h...": [1, 3, 5] } }
+}
+```
+</file>
+
+<file path="server.js">
+const Koa = require('koa');
+const Router = require('koa-router');
+const bodyParser = require('koa-bodyparser');
+const serve = require('koa-static');
+const path = require('path');
+const fs = require('fs');
+/* ---------- thesvg — بارگذاری آیکون‌ها (اختیاری) ---------- */
+let ICONS = {};
+try {
+  const mod = require('thesvg');
+  const candidates = [mod.icons, mod.default, mod];
+  for (const c of candidates) {
+    if (c && typeof c === 'object') {
+      for (const k of Object.keys(c)) {
+        if (typeof c[k] === 'string' && c[k].includes('<svg')) ICONS[k] = c[k];
+      }
+    }
+  }
+  console.log(`🎨 thesvg: ${Object.keys(ICONS).length} آیکون لود شد`);
+} catch (e) {
+  console.warn('⚠️  thesvg در دسترس نیست، از fallback داخلی استفاده می‌شود');
+}
+const app = new Koa();
+const router = new Router();
+const DATA_FILE = path.join(__dirname, 'data.json');
+
+/* ---------- ذخیره‌سازی روی فایل JSON ---------- */
+function loadData() {
+  if (!fs.existsSync(DATA_FILE)) {
+    const initial = { habits: [], records: {} };
+    fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2), 'utf8');
+    return initial;
+  }
+  try {
+    return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  } catch {
+    return { habits: [], records: {} };
+  }
+}
+function saveData(data) {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
+}
+
+/* ---------- Auth ساده (اختیاری) ---------- */
+if (process.env.AUTH_USER && process.env.AUTH_PASS) {
+  app.use(async (ctx, next) => {
+    const h = ctx.headers.authorization;
+    const fail = () => {
+      ctx.status = 401;
+      ctx.set('WWW-Authenticate', 'Basic realm="Habit Tracker"');
+      ctx.body = 'Auth required';
+    };
+    if (!h || !h.startsWith('Basic ')) return fail();
+    const [u, p] = Buffer.from(h.slice(6), 'base64').toString().split(':');
+    if (u !== process.env.AUTH_USER || p !== process.env.AUTH_PASS) return fail();
+    await next();
+  });
+}
+
+/* ---------- API ---------- */
+router.get('/api/data', (ctx) => {
+  ctx.body = loadData();
+});
+
+router.post('/api/habits', (ctx) => {
+  const data = loadData();
+  const { name, goal } = ctx.request.body || {};
+  if (!name) { ctx.status = 400; ctx.body = { error: 'name required' }; return; }
+  const habit = {
+    id: 'h' + Date.now().toString(36),
+    name: String(name).trim(),
+    goal: Math.max(1, Math.min(31, Number(goal) || 1))
+  };
+  data.habits.push(habit);
+  saveData(data);
+  ctx.body = { ok: true, habit };
+});
+
+router.put('/api/habits/:id', (ctx) => {
+  const data = loadData();
+  const h = data.habits.find((x) => x.id === ctx.params.id);
+  if (!h) { ctx.status = 404; return; }
+  const { name, goal } = ctx.request.body || {};
+  if (name !== undefined) h.name = String(name).trim();
+  if (goal !== undefined) h.goal = Math.max(1, Math.min(31, Number(goal) || 1));
+  saveData(data);
+  ctx.body = { ok: true, habit: h };
+});
+
+router.delete('/api/habits/:id', (ctx) => {
+  const data = loadData();
+  const id = ctx.params.id;
+  data.habits = data.habits.filter((x) => x.id !== id);
+  for (const key of Object.keys(data.records)) delete data.records[key][id];
+  saveData(data);
+  ctx.body = { ok: true };
+});
+
+router.post('/api/toggle', (ctx) => {
+  const { monthKey, habitId, day } = ctx.request.body || {};
+  if (!monthKey || !habitId || !day) { ctx.status = 400; return; }
+  const data = loadData();
+  if (!data.records[monthKey]) data.records[monthKey] = {};
+  if (!data.records[monthKey][habitId]) data.records[monthKey][habitId] = [];
+  const arr = data.records[monthKey][habitId];
+  const idx = arr.indexOf(day);
+  if (idx >= 0) arr.splice(idx, 1); else arr.push(day);
+  arr.sort((a, b) => a - b);
+  saveData(data);
+  ctx.body = { ok: true, checks: arr };
+});
+router.get('/api/icons', (ctx) => { ctx.body = ICONS; });
+app.use(bodyParser());
+app.use(serve(path.join(__dirname, 'public')));
+app.use(router.routes()).use(router.allowedMethods());
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`✅ http://localhost:${PORT}`));
+</file>
+
+</files>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#09090B">
+<title>ردیاب عادت ماهانه</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: {
+    colors: {
+      primary:'#27272A','primary-hover':'#18181B',
+      secondary:'#8B5CF6','secondary-hover':'#7C3AED',
+      success:'#16A34A', warning:'#D97706', danger:'#DC2626',
+      bg0:'#09090B', bg1:'#111113', bg2:'#18181B', bg3:'#27272A',
+      line1:'#27272A', line2:'#3F3F46',
+      fg1:'#FAFAFA', fg2:'#A1A1AA', fg3:'#71717A',
+    },
+    fontFamily: {
+      sans: ['Vazirmatn','Inter','system-ui','sans-serif'],
+      num:  ['"Times New Roman"','Times','serif'],
+      en:   ['"Libre Franklin"','"Franklin Gothic Medium"','sans-serif'],
+      mono: ['"JetBrains Mono"','monospace'],
+    }
+  }}
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300..900&family=Libre+Franklin:wght@400;500;600;700;800;900&family=Inter:wght@300..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body class="min-h-screen bg-bg0 text-fg1 font-sans antialiased">
+
+<div class="bg-orbit" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="bg-mouse" id="bg-mouse" aria-hidden="true"></div>
+
+<div class="relative z-10 mx-auto max-w-[1500px] px-4 md:px-6 py-5 flex flex-col gap-4">
+
+  <!-- ─── HEADER ─── -->
+  <header class="flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <span id="brand-logo" class="brand-logo" aria-hidden="true"></span>
+      <div class="flex items-baseline gap-3">
+        <h1 class="text-xl md:text-2xl font-bold tracking-tight">ردیاب عادت ماهانه</h1>
+        <span class="en hidden md:inline text-[10px] font-mono font-semibold tracking-[0.2em] text-fg3 uppercase">Levels / Habit Tracker</span>
+      </div>
+    </div>
+
+    <div class="flex items-end gap-2 flex-wrap">
+      <label class="flex flex-col gap-1">
+        <span class="en text-[10px] font-mono uppercase tracking-widest text-fg3">سال</span>
+        <select id="year-select" class="num h-9 min-w-[100px] rounded-md border border-line2 bg-bg2 px-3 text-base text-fg1 outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25 transition"></select>
+      </label>
+      <label class="flex flex-col gap-1">
+        <span class="en text-[10px] font-mono uppercase tracking-widest text-fg3">ماه</span>
+        <select id="month-select" class="h-9 min-w-[130px] rounded-md border border-line2 bg-bg2 px-3 text-sm text-fg1 outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25 transition"></select>
+      </label>
+
+      <label class="toolbar-switch" title="نمایش/مخفی باکس تاریخ">
+        <input type="checkbox" id="toggle-date" checked>
+        <span class="ts-track"><span class="ts-thumb"></span></span>
+        <span class="ts-label">تاریخ</span>
+      </label>
+
+      <label class="toolbar-switch" title="نمایش/مخفی ستون عادت">
+        <input type="checkbox" id="toggle-habit-col" checked>
+        <span class="ts-track"><span class="ts-thumb"></span></span>
+        <span class="ts-label">ستون عادت</span>
+      </label>
+
+      <button id="cmd-toggle" class="h-9 px-3 rounded-md border border-line2 bg-bg2 text-sm text-fg2 hover:bg-bg3 hover:text-fg1 transition flex items-center gap-2" title="پنل کنترل (Ctrl+K)">
+        <span data-icon="settings" class="icon-16"></span>
+        <span class="en hidden sm:inline text-[11px] font-semibold tracking-wider">CONTROL</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ─── HERO ─── -->
+  <section id="hero" class="grid grid-cols-1 lg:grid-cols-[260px_1fr_200px] gap-4 items-stretch">
+
+    <!-- Date box -->
+    <div id="date-box" class="date-card">
+      <div class="date-inner">
+        <div class="date-row">
+          <span class="en date-key">سال</span>
+          <span class="num date-val" id="info-year">—</span>
+        </div>
+        <div class="date-row">
+          <span class="en date-key">ماه</span>
+          <span class="date-val" id="info-month">—</span>
+        </div>
+        <div class="date-sep"></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <div class="en date-key">شروع</div>
+            <div class="num date-sub" id="info-start">—</div>
+          </div>
+          <div>
+            <div class="en date-key">پایان</div>
+            <div class="num date-sub" id="info-end">—</div>
+          </div>
+        </div>
+        <div class="date-row">
+          <span class="en date-key">تعداد روز</span>
+          <span class="num date-val" id="info-days">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wave -->
+    <div id="wave-box" class="relative rounded-lg border border-line1 bg-bg2/50 backdrop-blur overflow-hidden min-h-[190px]">
+      <div class="en absolute top-2 right-3 text-[10px] font-semibold tracking-[0.2em] text-fg3 z-10 uppercase">Trend / این ماه</div>
+      <svg id="wave-svg" class="w-full h-[190px]" viewBox="0 0 1000 190" preserveAspectRatio="none"></svg>
+    </div>
+
+    <!-- Success rate -->
+    <div id="rate-box" class="rounded-lg border border-line1 bg-bg2/70 backdrop-blur p-4 flex flex-col justify-between">
+      <div class="en text-[10px] font-semibold tracking-[0.2em] text-fg3 uppercase">Success Rate</div>
+      <div class="num text-5xl font-bold tabular-nums leading-none" id="rate-big">0%</div>
+      <div id="rate-badge" class="en text-sm font-bold tracking-wide">—</div>
+    </div>
+  </section>
+
+  <!-- ─── HABITS PANEL ─── -->
+  <section id="habits-panel" class="rounded-lg border border-line1 bg-bg1/60 backdrop-blur overflow-hidden">
+    <div class="panel-head">
+      <button id="panel-toggle" class="flex-1 flex items-center gap-2 py-3 px-4 hover:bg-white/[.02] transition text-right" aria-expanded="true">
+        <span data-icon="chevron" class="chev icon-16"></span>
+        <h2 class="text-base font-semibold">عادت‌ها</h2>
+        <span class="num text-xs text-fg3" id="panel-count">(0)</span>
+      </button>
+      <button id="add-habit" class="m-3 h-9 px-3 rounded-md bg-secondary text-white text-sm font-medium hover:bg-secondary-hover transition flex items-center gap-1.5">
+        <span data-icon="plus" class="icon-14"></span>
+        افزودن
+      </button>
+    </div>
+
+    <div id="panel-body" class="panel-body">
+      <div id="table-wrap" class="w-full overflow-x-auto custom-scroll">
+        <div class="min-w-max">
+          <div class="habit-head">
+            <div class="col-habit">
+              <span data-icon="block" class="icon-14 text-fg3"></span>
+              <span class="en text-[10px] font-semibold tracking-widest text-fg3 uppercase ms-2">Habit</span>
+            </div>
+            <div class="col-goal"><span class="en text-[10px] font-semibold tracking-widest text-fg3 uppercase">Goal</span></div>
+            <div class="col-days" id="days-header"></div>
+            <div class="col-progress"><span class="en text-[10px] font-semibold tracking-widest text-fg3 uppercase">Progress</span></div>
+          </div>
+          <div id="habit-list"></div>
+          <div id="habit-foot" class="habit-row habit-foot"></div>
+        </div>
+      </div>
+
+      <div id="empty-state" class="hidden px-6 py-10 text-center text-fg3">
+        <p class="mb-3">هنوز عادتی اضافه نکردی.</p>
+        <button id="add-first" class="h-9 px-4 rounded-md bg-secondary text-white text-sm font-medium hover:bg-secondary-hover transition">
+          افزودن اولین عادت
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── DONUTS ─── -->
+  <section id="donuts" class="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-center">
+    <div class="donut-card">
+      <svg class="donut" viewBox="0 0 120 120" data-id="donut-month"></svg>
+      <div class="donut-side"><div class="en donut-label">MONTHLY<br>PROGRESS</div></div>
+    </div>
+    <div class="donut-card">
+      <svg class="donut" viewBox="0 0 120 120" data-id="donut-days"></svg>
+      <div class="donut-side"><div class="en donut-label">DAYS<br>NORMALIZED</div></div>
+    </div>
+    <div class="donut-card">
+      <svg class="donut" viewBox="0 0 120 120" data-id="donut-last"></svg>
+      <div class="donut-side"><div class="en donut-label">LAST 3 DAYS<br>MOMENTUM</div></div>
+    </div>
+    <div class="text-left md:text-right leading-[0.95] font-black tracking-tight">
+      <div class="en text-3xl md:text-4xl text-fg1">MONTHLY</div>
+      <div class="en text-3xl md:text-4xl text-fg1">HABIT</div>
+      <div class="en text-3xl md:text-4xl text-fg3">TRACKER</div>
+    </div>
+  </section>
+
+  <div class="text-center text-xs text-fg3 tabular-nums pb-4">
+    <span class="num" id="footer-total">0 / 0</span>
+    <span class="en ml-2 tracking-widest uppercase">Completed</span>
+  </div>
+</div>
+
+<!-- ─── CONTROL PANEL ─── -->
+<aside id="cmd-panel" class="cmd-panel" aria-hidden="true">
+  <div class="cmd-head">
+    <div class="flex items-center gap-2">
+      <span data-icon="block" class="icon-14 text-secondary"></span>
+      <div class="en text-[10px] font-semibold tracking-[0.25em] text-fg3 uppercase">Control Panel</div>
+    </div>
+    <button id="cmd-close" class="icon-btn" aria-label="بستن" data-icon-btn="x"></button>
+  </div>
+
+  <div class="cmd-section">
+    <div class="en cmd-label">VIEWS</div>
+    <label class="cmd-row"><span>باکس تاریخ</span><input type="checkbox" data-view="date" checked></label>
+    <label class="cmd-row"><span>نمودار سینوسی</span><input type="checkbox" data-view="wave" checked></label>
+    <label class="cmd-row"><span>نرخ موفقیت</span><input type="checkbox" data-view="rate" checked></label>
+    <label class="cmd-row"><span>لیست عادت‌ها</span><input type="checkbox" data-view="habits" checked></label>
+    <label class="cmd-row"><span>دونات‌ها</span><input type="checkbox" data-view="donuts" checked></label>
+  </div>
+
+  <div class="cmd-section">
+    <div class="en cmd-label">MODE</div>
+    <label class="cmd-row"><span>فشرده کردن همه</span><input type="checkbox" id="cmd-compact-all"></label>
+    <label class="cmd-row"><span>حذف پس‌زمینه چرخشی</span><input type="checkbox" id="cmd-no-orbit"></label>
+    <label class="cmd-row"><span>هاله‌ی موس</span><input type="checkbox" id="cmd-mouse-glow" checked></label>
+  </div>
+
+  <div class="en cmd-hint">Ctrl / Cmd + K</div>
+</aside>
+
+<!-- ─── MODAL ─── -->
+<div id="modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+  <div class="w-full max-w-md rounded-lg border border-line1 bg-bg2 p-6 shadow-2xl">
+    <h3 id="modal-title" class="mb-4 text-lg font-semibold">افزودن عادت</h3>
+    <form id="habit-form" class="flex flex-col gap-4">
+      <input type="hidden" id="habit-id">
+      <label class="flex flex-col gap-1.5">
+        <span class="text-xs text-fg2">نام عادت</span>
+        <input type="text" id="habit-name" required maxlength="80" placeholder="مثلاً: ورزش صبحگاهی ۵ دقیقه"
+          class="h-10 rounded-md border border-line2 bg-bg1 px-3 text-sm text-fg1 outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25 transition">
+      </label>
+      <label class="flex flex-col gap-1.5">
+        <span class="text-xs text-fg2">هدف ماهانه (تعداد دفعات)</span>
+        <input type="number" id="habit-goal" required min="1" max="31" value="20"
+          class="num h-10 rounded-md border border-line2 bg-bg1 px-3 text-base text-fg1 outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25 transition">
+      </label>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" id="cancel" class="h-9 px-4 rounded-md border border-line2 text-sm text-fg2 hover:bg-bg3 hover:text-fg1 transition">انصراف</button>
+        <button type="submit" class="h-9 px-4 rounded-md bg-secondary text-white text-sm font-medium hover:bg-secondary-hover transition">ذخیره</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- global error banner (مخفی به صورت پیش‌فرض) -->
+<div id="error-banner" class="error-banner" hidden>
+  <span data-icon="x" class="icon-14"></span>
+  <span id="error-text">خطای غیرمنتظره</span>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

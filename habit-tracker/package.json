@@ -1,0 +1,18 @@
+{
+  "name": "habit-tracker-fa",
+  "version": "1.1.0",
+  "description": "ردیاب عادت ماهانه شمسی — Levels design system",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "koa": "^2.15.3",
+    "koa-bodyparser": "^4.4.1",
+    "koa-router": "^12.0.1",
+    "koa-static": "^5.0.0",
+    "thesvg": "latest"
+  },
+  "engines": { "node": ">=18" }
+}
