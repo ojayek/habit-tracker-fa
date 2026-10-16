@@ -1,6 +1,7 @@
 <div align="center">
 
-# 📅 ردیاب عادت ماهانه شمسیC:\Users\hessam\Desktop\habit-tracker\habit-tracker\docs\hero.png
+# 📅 ردیاب عادت ماهانه شمسی<img width="1872" height="852" alt="hero" src="https://github.com/user-attachments/assets/c836333f-9b14-4f20-aff0-3789312f4600" />
+
 
 ### یک ردیاب عادت مینیمال با تقویم جلالی
 
